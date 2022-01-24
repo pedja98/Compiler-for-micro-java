@@ -1,0 +1,26 @@
+program MJProgram
+int a[];
+{
+	void main() 
+	char c[];
+	int na, nc;
+	{
+		na = 10;
+		nc = 7;
+		
+		a = new int[na];
+		c = new char[nc];
+		
+		read(c[3]);
+		print(c[3]);
+		
+		c[0] = 'p';
+		print(c[0]);
+		
+		a[1*2+3] = -9*6 +30;
+		print(a[1*2+3]);
+		
+		read(a[0]);
+		print(a[0]);
+	}
+}

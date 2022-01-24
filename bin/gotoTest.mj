@@ -1,0 +1,15 @@
+program MJProgram
+
+{
+	void main() {
+		goto b;
+		
+		a:print('a');
+		goto c;
+		
+		b:print('b');
+		goto a;
+		
+		c:print('c');
+	}
+}

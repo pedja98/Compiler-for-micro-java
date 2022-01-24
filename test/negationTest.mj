@@ -1,0 +1,17 @@
+program MJProgram
+int a;
+
+{
+	void main() 
+	int b;
+	{
+		a = -2;
+		print(a);
+		
+		b = -2*a + 3;
+		print(b);
+		
+		b = -(-(-b + 2 - 3*a) + 4) * 9 + (-7 + 13);
+		print(b);
+	}
+}

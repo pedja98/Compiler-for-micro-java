@@ -1,0 +1,322 @@
+
+
+package rs.ac.bg.etf.pp1;
+
+import java_cup.runtime.*;
+import org.apache.log4j.*;
+import rs.ac.bg.etf.pp1.ast.*;
+
+parser code {:
+
+	boolean errorDetected;
+
+	Logger log = Logger.getLogger(getClass());
+     
+    public void report_fatal_error(String message, Object info) throws java.lang.Exception {
+      done_parsing();
+      report_error(message, info);
+    }
+  
+    public void syntax_error(Symbol cur_token) {
+        report_error("Detektovana sintaksna greska na liniji ", cur_token);
+    }
+  
+    public void unrecovered_syntax_error(Symbol cur_token) throws java.lang.Exception {
+        report_fatal_error("Fatalna greska, parsiranje se ne moze nastaviti", cur_token);
+    }
+
+    public void report_error(String message, Object info) {
+    	errorDetected = true;
+    	StringBuilder msg = new StringBuilder(message); 
+    	if (info instanceof Symbol)
+            msg.append (" na liniji ").append(((Symbol)info).left);
+        log.error(msg.toString());
+    }
+
+:}
+
+init with {:
+	errorDetected = false;
+:}
+
+scan with {:
+	Symbol s = this.getScanner().next_token();
+	if (s != null && s.value != null) 
+		log.info(s.toString() + " " + s.value.toString());
+	return s;
+:}
+
+terminal PROG, BREAK, CLASS, ENUM, ELSE, CONST, IF, DO, WHILE, NEW, PRINT, READ, RETURN;
+terminal VOID, EXTENDS, CONTINUE, THIS, SUPER, GOTO, RECORD;
+
+terminal String IDENT;
+
+terminal Integer NUM_CONST;
+terminal String BOOL_CONST;
+terminal String CHAR_CONST;
+
+terminal PLUS, MINUS, MUL, DIV, REM, EQUAL;
+terminal EQ_TO, NOT_EQ_TO, GT, GT_EQ, LE, LE_EQ;
+terminal AND, OR;
+terminal INC, DEC;
+
+terminal FULL_STOP, SEMI, COL, COMMA;
+terminal BRACKETS_O, BRACKETS_C, SQ_BRACKETS_O, SQ_BRACKETS_C, CUR_BRACKETS_O, CUR_BRACKETS_C;
+
+nonterminal ElemDeclList, MethodDeclList, ElemDec, ConstDecl, ConstDeclList;
+nonterminal VarDecl, VarDeclList, ClassDecl, Extends, ClassFieldList, ReturnType, FormPars;
+nonterminal MethodVars, FormPar, StatementList, Statement, LabelDef, Label, MethodVarList;
+nonterminal Statements, SingleStatement, DesignatorStatement, ActPars, ExprList, BrO, BrC;
+nonterminal DoWhile, Return, Read, Print, Addop, Mulop, PrintNum, Negation, NoNegation;
+nonterminal Assignop, Condition, Relop, CondTerm, CondTermList, CondFact, CondFactList;
+nonterminal DesObjArrList, DesObjArr, Matched, Unmatched, DesAsgnErrFix, VarDeclErrFix, MethodVarDeclaration;
+nonterminal MethodVarDeclList, VarDecListErr, Var, Const, MethodVar, FormParamTypeName, ReadOp;
+
+nonterminal rs.etf.pp1.symboltable.concepts.Obj ProgramName, Program, MethTypeName, MethodDecl, Designator, DesLeftAsgn, DesArrName;
+nonterminal rs.etf.pp1.symboltable.concepts.Struct Type, RetType, Expr, Term, TermList, Factor, ReadDesignator;
+
+Program ::= (Program) PROG ProgramName:p ElemDeclList CUR_BRACKETS_O MethodDeclList CUR_BRACKETS_C;
+
+ProgramName ::= (ProgramName) IDENT:progName;
+
+ElemDeclList ::= (ElemDeclaration) ElemDec 
+			 |   (NoElemDecl)
+			 ;
+
+ElemDec ::= (CoDecl) ConstDecl ElemDeclList 
+		|   (VaDecl) VarDecl ElemDeclList 
+		|   (ClDec)  ClassDecl ElemDeclList
+		;
+
+ConstDecl ::= (ConstDeclaration) CONST Type:constType Const ConstDeclList SEMI;
+
+ConstDeclList ::=(ConstDeclarationList) COMMA Const ConstDeclList 
+			  |  (NoConst)
+			  ;
+
+Const ::= (NumberConst) IDENT:constName EQUAL NUM_CONST:numVal
+	  |   (CharachterConst) IDENT:constName EQUAL CHAR_CONST:charVal
+	  |	  (BooleanConst) IDENT:constName EQUAL BOOL_CONST:boolVal
+	  ;
+
+Type ::= (Type) IDENT:typeName;
+
+VarDecl ::= (VarDeclaration) Type:varType VarDeclErrFix SEMI;
+
+VarDeclErrFix ::= (VarDeclFix) Var VarDeclList
+			  |   (VarDeclErrFix) error:e
+			  	  {: parser.report_error("Izvrsen oporavak od greske detektovane pri deklarisanju globalne promenljive do ; ili do , na liniji " + eleft ,null);  :} 
+			  ;
+
+VarDeclList ::= (VarDeclarationList) VarDeclList COMMA Var
+			|   (NoVar)
+			| 	(VarDeclarationListErrFix) VarDeclList COMMA VarDecListErr
+			;
+			
+VarDecListErr ::= (VarDecListErr) error:e {: parser.report_error("Izvrsen oporavak od greske detektovane pri deklarisanju globalne promenljive do ; ili do , na liniji" + eleft ,null);  :} ;
+
+Var ::= (VarNoArr) IDENT:varName
+	|   (VarArr) IDENT:varName SQ_BRACKETS_O SQ_BRACKETS_C 
+	;
+
+ClassDecl ::= (ClassDeclarationNoMet) CLASS IDENT:className Extends CUR_BRACKETS_O ClassFieldList CUR_BRACKETS_C 
+		  |   (ClassDeclarationMet) CLASS IDENT:className Extends CUR_BRACKETS_O ClassFieldList CUR_BRACKETS_O MethodDeclList CUR_BRACKETS_C CUR_BRACKETS_C
+		  ;
+
+Extends ::= (ExtendClass) COL Type 
+		|   (NoExtendClass)
+		;
+
+ClassFieldList ::= (ClassFieldLst) VarDecl ClassFieldList 
+			   |   (NoClassField)
+			   ;
+
+MethodDeclList ::=(MethodDeclaration) MethodDecl MethodDeclList
+			   |  (NoMethod)
+			   ;
+
+MethodDecl ::= (MethodDecl) MethTypeName BRACKETS_O FormPars BRACKETS_C MethodVars CUR_BRACKETS_O StatementList CUR_BRACKETS_C;
+
+MethTypeName ::= (MethTypeName) ReturnType IDENT:mtdName;
+
+ReturnType ::= (ReturnTypeVoid) VOID:mtdVoid 
+		   |   (ReturnTypeNoVoid) RetType
+		   ;
+
+RetType ::= (RetTypeType) IDENT:mtdTypeName;
+
+MethodVars ::= (MtdVars) MethodVarList 
+		   |   (NoMtdVars)
+		   ;
+		   
+MethodVarList ::= (MethodVarLst) MethodVarDeclaration MethodVarList 
+			  |   (MethodVarListOneElem) MethodVarDeclaration
+			  ;
+
+MethodVarDeclaration ::= (MethodVarDeclaration) Type:mtdVarType MethodVar MethodVarDeclList SEMI;
+
+MethodVarDeclList ::= (MethodVarDeclLst) MethodVarDeclList COMMA MethodVar
+				  |   (NoMethodVarDeclList)
+				  ;
+
+MethodVar ::= (MethodVarNoArray) IDENT:mtdVarName
+		  |   (MethodVarArray) IDENT:mtdVarName SQ_BRACKETS_O SQ_BRACKETS_C  
+		  ;
+
+FormPars ::= (FormParams) FormParamTypeName FormPar 
+		 |   (NoFormParams)
+		 ;
+
+FormPar ::= (FormParm) COMMA FormParamTypeName FormPar 
+		|   (NoFormParam)
+		;
+
+FormParamTypeName ::= (FormParamNoArr) Type:paramType IDENT:paramName
+				  |	  (FormParamArr) Type:paramType IDENT:paramName SQ_BRACKETS_O SQ_BRACKETS_C 
+				  ;
+
+StatementList ::= (StatementLst) Statement StatementList 
+			  |   (NoStatementList)
+			  ;
+
+Statement ::= (MatchedStmt) Matched
+		  |   (UnmatchedStmt) Unmatched
+		  ; 
+
+Matched ::= (StmLabel) LabelDef SingleStatement 
+		|   (StmNoLabel) SingleStatement 
+		|   (StmsMatched) Statements
+		;
+
+Unmatched ::= (UnmatchedIf) IF BRACKETS_O Condition BRACKETS_C Statement
+		  |   (UnmatchedIfElse) IF BRACKETS_O Condition BRACKETS_C Matched ELSE Unmatched
+		  ;
+
+Statements ::= (Stms) CUR_BRACKETS_O StatementList CUR_BRACKETS_C;
+
+LabelDef ::= (LabDef) Label COL;
+
+Label ::=(Lab) IDENT:labelName;
+
+SingleStatement ::= (DesSingleStm) DesignatorStatement SEMI
+				|   (DoWhileSingleStm) DoWhile SEMI
+				|   (BreakSingleStm) BREAK SEMI
+				|   (ContinueSingleStm) CONTINUE SEMI
+				|   (RetSingleStm) Return SEMI
+				|   (ReadSingleStm) Read SEMI
+				|   (PrintSingleStm) Print SEMI
+				|   (GotoSingleStm) GOTO IDENT:gotoLabelName SEMI
+				| 	(MatchedStatement) IF BRACKETS_O Condition BRACKETS_C Matched ELSE Matched
+				;
+
+DesignatorStatement ::= (DesStatementAsgnExpr) DesLeftAsgn Assignop Expr
+					|   (DesStatementIsFun) Designator BRACKETS_O ActPars BRACKETS_C
+					|   (DesStatementInc) Designator INC
+					|   (DesStatementDec) Designator DEC
+					|   (DesStatementAsgnExprErrFix) DesLeftAsgn Assignop DesAsgnErrFix
+					;
+
+DesLeftAsgn ::= (DesLeftAsgn) Designator;
+
+DesAsgnErrFix ::= (DesAsgnErrorFixing) error:e 
+			  	  {: parser.report_error("Izvrsen oporavak od greske detektovane pri konstrukciji iskaza dodele do ; na liniji " + eleft ,null);  :} 
+			  ;
+
+
+Designator ::= (DesNotArr) IDENT:desName
+		   |   (DesArr) DesArrName SQ_BRACKETS_O Expr SQ_BRACKETS_C
+		   ;
+		   
+DesArrName ::= (DesArrName) IDENT:desName;
+
+Condition ::= (Cond) CondTerm CondTermList;
+
+CondTerm ::= (ConditionTerm) CondFact CondFactList;
+
+CondTermList ::= (CondTermLst) OR CondTerm CondTermList 
+			 |   (NoCondTermList)
+			 ;
+
+CondFact ::= (ConditionFact) Expr 
+		 |   (CondFactWithOp) Expr Relop Expr
+		 ;
+
+CondFactList ::= (CondFactLst) AND CondFact CondFactList 
+			 | (NoCondFactList)
+			 ;
+
+DoWhile ::= (DoWle) DO Statement WHILE BRACKETS_O Condition BRACKETS_C;
+
+Return ::= (RetNoExpr) RETURN 
+       |   (RetExpr) RETURN Expr
+       ;
+
+Read ::= (Read) ReadOp BRACKETS_O ReadDesignator BRACKETS_C;
+
+ReadOp ::=(ReadOp) READ;
+
+ReadDesignator ::= (ReadDesignator) Designator;
+
+Print ::= (Print) PRINT BRACKETS_O Expr PrintNum BRACKETS_C;
+
+PrintNum ::= (PrintNumber) COMMA NUM_CONST 
+		 |   (NoPrintNumber)
+		 ;
+
+Expr ::= (MinusOneTerm) Negation Term
+	 |   (OneTerm) NoNegation Term
+	 | 	 (MoreTerm) NoNegation Term TermList 
+     |   (MinusMoreTerm) Negation Term TermList
+     ;
+     
+NoNegation ::= (NoNegation);
+     
+Negation ::= (Negation) MINUS;
+
+Term ::= (MulTerm) Term Mulop Factor
+	 |   (FactExpr) Factor
+	 ;
+
+TermList ::= (TermLst) TermList Addop Term
+		 |   (TermNoList) Addop Term
+		 ;
+
+Factor ::= (FactDes) Designator
+	   |   (FactDesFun) Designator BRACKETS_O ActPars BRACKETS_C 
+	   |   (FactNumConst) NUM_CONST:numVal
+	   |   (FactCharConst) CHAR_CONST:charVal
+	   |   (FactBoolConst) BOOL_CONST:boolVal
+	   |   (FactNewObj) NEW Type:objectType
+	   |   (FactNewArr) NEW Type:objectType SQ_BRACKETS_O Expr SQ_BRACKETS_C 
+	   |   (FactBracExpr) BrO Expr BrC
+	   ;
+
+BrO ::= (BrO) BRACKETS_O;
+BrC ::= (BrC) BRACKETS_C;
+
+ActPars ::= (ActParams) Expr ExprList 
+		|   (NoActParams)
+		;
+
+ExprList ::= (ExprLst) COMMA Expr ExprList 
+		 |   (NoExpressionList)
+		 ;
+
+Addop ::= (AddOperation) PLUS 
+	  |   (SubOperation) MINUS
+	  ;
+
+Mulop ::= (MulOperation) MUL 
+	  |   (DivOperation) DIV 
+	  |   (RemOperation) REM
+	  ;
+
+Assignop ::= (AssignOperation) EQUAL;
+
+Relop ::= (EqToOperation) EQ_TO 
+	  |   (NotEqToOperation) NOT_EQ_TO 
+	  |   (LeOperation) LE 
+	  |   (LeEqOperation) LE_EQ 
+	  |   (GtOperation) GT 
+	  |   (GtEqOperation) GT_EQ
+	  ;

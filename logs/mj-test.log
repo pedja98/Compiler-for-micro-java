@@ -1,0 +1,173 @@
+INFO  15:46:09,180 - Compiling source file: C:\Users\Mirkovic\Desktop\mp170361d pp1 project\pp1 project\workspace\MJCompiler\test\gotoTest.mj
+INFO  15:46:09,242 - #2 program
+INFO  15:46:09,242 - #22 MJProgram
+INFO  15:46:09,242 - #50 {
+INFO  15:46:09,244 - #15 void
+INFO  15:46:09,244 - #22 main
+INFO  15:46:09,245 - #46 (
+INFO  15:46:09,245 - #47 )
+INFO  15:46:09,246 - #50 {
+INFO  15:46:09,246 - #20 goto
+INFO  15:46:09,247 - #22 b
+INFO  15:46:09,247 - #43 ;
+INFO  15:46:09,247 - #22 a
+INFO  15:46:09,247 - #44 :
+INFO  15:46:09,247 - #12 print
+INFO  15:46:09,247 - #46 (
+INFO  15:46:09,248 - #25 'a'
+INFO  15:46:09,248 - #47 )
+INFO  15:46:09,249 - #43 ;
+INFO  15:46:09,250 - #20 goto
+INFO  15:46:09,250 - #22 c
+INFO  15:46:09,255 - #43 ;
+INFO  15:46:09,255 - #22 b
+INFO  15:46:09,255 - #44 :
+INFO  15:46:09,256 - #12 print
+INFO  15:46:09,256 - #46 (
+INFO  15:46:09,256 - #25 'b'
+INFO  15:46:09,256 - #47 )
+INFO  15:46:09,256 - #43 ;
+INFO  15:46:09,256 - #20 goto
+INFO  15:46:09,256 - #22 a
+INFO  15:46:09,256 - #43 ;
+INFO  15:46:09,256 - #22 c
+INFO  15:46:09,256 - #44 :
+INFO  15:46:09,256 - #12 print
+INFO  15:46:09,256 - #46 (
+INFO  15:46:09,257 - #25 'c'
+INFO  15:46:09,257 - #47 )
+INFO  15:46:09,257 - #43 ;
+INFO  15:46:09,257 - #51 }
+INFO  15:46:09,258 - #51 }
+INFO  15:46:09,268 - Program(
+  ProgramName(
+   MJProgram
+  ) [ProgramName]
+  NoElemDecl(
+  ) [NoElemDecl]
+  MethodDeclaration(
+    MethodDecl(
+      MethTypeName(
+        ReturnTypeVoid(
+        ) [ReturnTypeVoid]
+       main
+      ) [MethTypeName]
+      NoFormParams(
+      ) [NoFormParams]
+      NoMtdVars(
+      ) [NoMtdVars]
+      StatementLst(
+        MatchedStmt(
+          StmNoLabel(
+            GotoSingleStm(
+             b
+            ) [GotoSingleStm]
+          ) [StmNoLabel]
+        ) [MatchedStmt]
+        StatementLst(
+          MatchedStmt(
+            StmLabel(
+              LabDef(
+                Lab(
+                 a
+                ) [Lab]
+              ) [LabDef]
+              PrintSingleStm(
+                Print(
+                  OneTerm(
+                    NoNegation(
+                    ) [NoNegation]
+                    FactExpr(
+                      FactCharConst(
+                       'a'
+                      ) [FactCharConst]
+                    ) [FactExpr]
+                  ) [OneTerm]
+                  NoPrintNumber(
+                  ) [NoPrintNumber]
+                ) [Print]
+              ) [PrintSingleStm]
+            ) [StmLabel]
+          ) [MatchedStmt]
+          StatementLst(
+            MatchedStmt(
+              StmNoLabel(
+                GotoSingleStm(
+                 c
+                ) [GotoSingleStm]
+              ) [StmNoLabel]
+            ) [MatchedStmt]
+            StatementLst(
+              MatchedStmt(
+                StmLabel(
+                  LabDef(
+                    Lab(
+                     b
+                    ) [Lab]
+                  ) [LabDef]
+                  PrintSingleStm(
+                    Print(
+                      OneTerm(
+                        NoNegation(
+                        ) [NoNegation]
+                        FactExpr(
+                          FactCharConst(
+                           'b'
+                          ) [FactCharConst]
+                        ) [FactExpr]
+                      ) [OneTerm]
+                      NoPrintNumber(
+                      ) [NoPrintNumber]
+                    ) [Print]
+                  ) [PrintSingleStm]
+                ) [StmLabel]
+              ) [MatchedStmt]
+              StatementLst(
+                MatchedStmt(
+                  StmNoLabel(
+                    GotoSingleStm(
+                     a
+                    ) [GotoSingleStm]
+                  ) [StmNoLabel]
+                ) [MatchedStmt]
+                StatementLst(
+                  MatchedStmt(
+                    StmLabel(
+                      LabDef(
+                        Lab(
+                         c
+                        ) [Lab]
+                      ) [LabDef]
+                      PrintSingleStm(
+                        Print(
+                          OneTerm(
+                            NoNegation(
+                            ) [NoNegation]
+                            FactExpr(
+                              FactCharConst(
+                               'c'
+                              ) [FactCharConst]
+                            ) [FactExpr]
+                          ) [OneTerm]
+                          NoPrintNumber(
+                          ) [NoPrintNumber]
+                        ) [Print]
+                      ) [PrintSingleStm]
+                    ) [StmLabel]
+                  ) [MatchedStmt]
+                  NoStatementList(
+                  ) [NoStatementList]
+                ) [StatementLst]
+              ) [StatementLst]
+            ) [StatementLst]
+          ) [StatementLst]
+        ) [StatementLst]
+      ) [StatementLst]
+    ) [MethodDecl]
+    NoMethod(
+    ) [NoMethod]
+  ) [MethodDeclaration]
+) [Program]
+INFO  15:46:09,273 - Obradjuje se funkcija main na liniji 4
+INFO  15:46:09,274 - ===================================
+INFO  15:46:09,275 - Parsiranje uspesno zavrseno!
